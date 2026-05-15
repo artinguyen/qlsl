@@ -1,0 +1,80 @@
+﻿
+/* Set padding to keep content from hitting the edges */
+/*.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}*/
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+/*.dl-horizontal dt {
+    white-space: normal;
+}*/
+
+/* Set width on the form input elements since they're 100% wide by default */
+/*input,
+select,
+textarea {
+    max-width: 280px;
+}*/
+table td {
+    //padding: 0.3rem 0.75rem !important;
+}
+.pc-container .page-header + .row {
+     padding-top: 0 !important; 
+}
+
+
+/* Change the main container height */
+.select2-container .select2-selection--single {
+    height: 40px !important;
+}
+
+/* Adjust the text vertical alignment */
+.select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 40px !important;
+}
+
+/* Adjust the dropdown arrow vertical alignment */
+.select2-container .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+}
+
+#searchBox {
+    border-radius: 4px;
+    padding: 0.344rem 0.4rem;
+    width: 200px;
+    max-width: 100%;
+}
+
+#detailBooking table td:nth-child(1) {
+    font-weight: bold;
+    width: 30%;
+}
+.scroll-order-tbl {
+    overflow-x: auto;
+}
+.scroll-order-tbl table th{
+    min-width: 140px;
+}
+.scroll-order-tbl table th:nth-child(1), .scroll-order-tbl table th:nth-child(9), .scroll-order-tbl table th:nth-child(10) {
+     width: auto;
+     min-width: 0;
+}
+.img-fluid {
+    height: 50px;
+}
+.pc-sidebar .m-header {
+    justify-content: center;
+}
+.highlight-row {
+    background-color: #ffd3d3 !important;
+    transition: background-color 0.5s ease;
+}
+.section-manual {
+    display: none;
+}
+#containerTable input[type="text"] {
+    min-width: 100px !important;
+}

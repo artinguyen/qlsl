@@ -1,0 +1,187 @@
+﻿@*@model IEnumerable<QLXDK.Models.Entities.VoyageDetail>*@
+@model IEnumerable<QLXDK.Models.Views.VoyageDetailRow>
+@{
+    ViewBag.Title = "Chuyến sà lan";
+    ViewBag.Action = "Cập nhật danh sách container";
+}
+<section id="tblSubDetail">
+    <div class="row">
+        <div class="col-md-12">
+            <input id="SubVoyageId" value="@ViewBag.SubVoyageId" name="SubVoyageId" type="hidden" />
+            <button class="btn btn-primary" type="button" id="btnApprove">Approve</button>
+            <button class="btn btn-danger" type="button" id="btnDelete">Delete</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <th><input type="checkbox" id="checkAll"></th>
+                <th>ContainerNo</th>
+                <th>SizeType</th>
+                <th>Line</th>
+                <th>BookingBillNo</th>
+                <th>SealNo</th>
+                <th>FullEmpty</th>
+                <th>Category</th>
+                <th>VesVoyName</th>
+                <th>PortOfLoad</th>
+                <th>PortOfDischarge</th>
+                <th>GrossWeight</th>
+                <th>VGM</th>
+                <th>TemperatureC</th>
+                <th>IMO</th>
+                <th>UN</th>
+                <th>Commodity</th>
+                <th>Remarks</th>
+                <th>Status</th>
+                <th>Approved By</th>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model)
+            {
+                        <tr data-id="@item.Detail.ID">
+                            <td>@(item.Detail.ApprovedDate == null ? Html.Raw("<input type='checkbox' class='row-select'/>") : Html.Raw(""))</td>
+                            <td>@item.Detail.ContainerNo</td>
+                            <td>@item.Detail.SizeType</td>
+                            <td>@item.Detail.Line</td>
+                            <td>@item.Detail.BookingBillNo</td>
+                            <td>@item.Detail.SealNo</td>
+                            <td>@item.Detail.FullEmpty</td>
+                            <td>@item.Detail.Category</td>
+                            <td>@item.Detail.VesVoyName</td>
+                            <td>@item.Detail.PortOfLoad</td>
+                            <td>@item.Detail.PortOfDischarge</td>
+                            <td>@item.Detail.GrossWeight</td>
+                            <td>@item.Detail.VGM</td>
+                            <td>@item.Detail.TemperatureC</td>
+                            <td>@item.Detail.IMO</td>
+                            <td>@item.Detail.UN</td>
+                            <td>@item.Detail.Commodity</td>
+                            <td>@item.Detail.Remarks</td>
+
+                            <td>@Html.Raw(item.Detail.ApprovedDate == null ? "<span class='badge bg-secondary'>Waiting</span>" : "<span class='badge bg-success'>Approved</span>")</td>
+                            <td>@item.ApprovedByUsername</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<!-- Modal -->
+<div class="modal fade bd-example-modal-sm " data-bs-backdrop='static' tabindex="-1" aria-labelledby="mySmallModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel">
+                    <span class="badge bg-danger">!</span>
+                    Thông báo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+
+        $('#tblSubDetail').on('click', '#btnApprove', function () {
+            var selectedList = [];
+            $('.row-select:checked').each(function () {
+                var id = $(this).closest('tr').data('id');
+                selectedList.push(id);
+            });
+
+            if (selectedList.length === 0) {
+                showAlert('Chưa có dòng nào được chọn');
+                return;
+            }
+            //console.log(selectedList.length)
+            //return;
+            var payload = {
+                SubVoyageId: $('#SubVoyageId').val(),
+                IDs: selectedList
+            };
+
+            $.ajax({
+                url: '@Url.Action("Approve", "Voyage")',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success !== undefined && !res.success) {
+                        showAlert(res.message);
+                    } else {
+                        $('#tblSubDetail').html(res);
+                    }
+
+                },
+                error: function (xhr) {
+                    showAlert('Đã có lỗi xảy ra');
+                }
+            });
+        });
+
+        $('#tblSubDetail').on('click', '#btnDelete', function () {
+            var selectedList = [];
+            $('.row-select:checked').each(function () {
+                var id = $(this).closest('tr').data('id');
+                selectedList.push(id);
+            });
+
+            if (selectedList.length === 0) {
+                showAlert('Chưa có dòng nào được chọn');
+                return;
+            }
+
+            var payload = {
+                SubVoyageId: $('#SubVoyageId').val(),
+                IDs: selectedList
+            };
+
+
+            $.ajax({
+                url: '@Url.Action("Delete", "Voyage")',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.success !== undefined && !res.success) {
+                        showAlert(res.message);
+                    } else {
+                        $('#tblSubDetail').html(res);
+                    }
+
+                },
+                error: function (xhr) {
+                    showAlert('Đã có lỗi xảy ra');
+                }
+            });
+        });
+
+
+        $(document).on('click', '#checkAll', function () {
+            var isChecked = $(this).prop('checked');
+            $('.row-select').prop('checked', isChecked);
+        });
+
+        $(document).on('click', '.row-select', function () {
+            if ($('.row-select:checked').length == $('.row-select').length) {
+                $('#checkAll').prop('checked', true);
+            } else {
+                $('#checkAll').prop('checked', false);
+            }
+        });
+
+        // --- Show alert ---
+        function showAlert(text) {
+            $('.bd-example-modal-sm').modal('show');
+            $('.modal-body').text(text);
+        }
+
+
+    </script>
+}

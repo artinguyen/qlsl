@@ -1,0 +1,142 @@
+﻿@model QLXDK.Models.Views.BookingVM
+@{
+    ViewBag.Title = "Booking";
+    ViewBag.Action = "Cập nhật thông tin";
+}
+@using (Html.BeginForm("Edit", "Booking", FormMethod.Post, new { id = "form-booking" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @if (TempData["Message"] != null)
+                            {
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    @TempData["Message"]
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Booking No</label>
+                                @Html.EditorFor(m => m.BookingNo, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.BookingNo, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Depot</label>
+                                @Html.DropDownList("DepotId", (SelectList)ViewBag.DepotList, "-- Chọn depot --", new { @class = "form-control select2", @style = "width:100%" })
+                                @Html.ValidationMessageFor(m => m.DepotId, "", new { @class = "text-danger" })
+                            </div>
+
+
+
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Sailing Date</label>
+                                @Html.EditorFor(m => m.SailingDate, new { htmlAttributes = new { @class = "form-control sailing-date" } })
+                                @Html.ValidationMessageFor(m => m.SailingDate, "", new { @class = "text-danger" })
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">SL Closing Time</label>
+                                @Html.EditorFor(m => m.SlClosingTime, new { htmlAttributes = new { @class = "form-control sl-closing-time" } })
+                                @Html.ValidationMessageFor(m => m.SlClosingTime, "", new { @class = "text-danger" })
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">VGM Closing Time</label>
+                                @Html.EditorFor(m => m.VgmClosingTime, new { htmlAttributes = new { @class = "form-control vgm-closing-time" } })
+                                @Html.ValidationMessageFor(m => m.VgmClosingTime, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Pickup At</label>
+                                @Html.EditorFor(m => m.PickupAt, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.PickupAt, "", new { @class = "text-danger" })
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Vessel/Voyage</label>
+                                @Html.EditorFor(m => m.Vessel, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.Vessel, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Port Of Loading</label>
+                                @Html.DropDownList("PortOfLoadingId", (SelectList)ViewBag.PortList, "-- Chọn port --", new { @class = "form-control select2", @style = "width:100%" })
+                                @Html.ValidationMessageFor(m => m.PortOfLoadingId, "", new { @class = "text-danger" })
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Closing Date</label>
+                                @Html.EditorFor(m => m.ClosingDate, new { htmlAttributes = new { @class = "form-control closing-date" } })
+                                @Html.ValidationMessageFor(m => m.ClosingDate, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">VGM Closing Date</label>
+                                @Html.EditorFor(m => m.VgmClosingDate, new { htmlAttributes = new { @class = "form-control vgm-closing-date" } })
+                                @Html.ValidationMessageFor(m => m.VgmClosingDate, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Quantity</label>
+                                @Html.EditorFor(m => m.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.Quantity, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Return At</label>
+                                @Html.EditorFor(m => m.ReturnAt, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.ReturnAt, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Remark</label>
+                                @Html.TextAreaFor(m => m.Remark, new
+                            {
+                                @class = "form-control",
+                                @rows = 3, // Số dòng hiển thị mặc định
+                                @placeholder = "Nhập ghi chú tại đây..."
+                            })
+                            </div>
+
+
+                        </div>
+                        <div class="col-12 text-center m-t-20">
+                            <button class="btn btn-primary" type="submit">Cập nhật</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

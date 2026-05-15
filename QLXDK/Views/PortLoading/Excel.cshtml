@@ -1,0 +1,182 @@
+﻿@{
+    ViewBag.Title = "Import Excel";
+}
+
+<h2>Import Excel</h2>
+
+<input type="file" id="excelFile" accept=".xlsx,.xls" />
+<button id="btnLoad" type="button">Load Excel</button>
+
+<div style="margin-top:16px;">
+    <button id="btnImport" type="button" class="btn btn-primary">
+        Import Selected Rows
+    </button>
+</div>
+
+<table id="dtPreview" class="display" style="width:100%; margin-top:16px;"></table>
+
+@section scripts{
+    <script>
+    let previewRows = [];   // lưu toàn bộ dữ liệu đã parse từ Excel
+    let dt = null;
+
+    function buildTableFromRows(rows, columns) {
+        // columns: [{data: 'Ma', title:'Mã'}, ...]
+        const dataTableColumns = [
+            {
+                title: '<input type="checkbox" id="checkAll" />',
+                orderable: false,
+                data: null,
+                render: function(data, type, row) {
+                    return `<input type="checkbox" class="row-select" data-idx="${row._idx}"/>`;
+                }
+            },
+            ...columns.map(c => ({ 
+            title: c.title, 
+            data: null, // Không dùng mapping tự động
+            render: function(data, type, row) {
+                // Truy xuất thủ công bằng ngoặc vuông - Cách này 100% ra dữ liệu
+                return row[c.data] || ''; 
+            }
+            }))
+        ];
+
+        if (dt) dt.destroy();
+
+        dt = $('#dtPreview').DataTable({
+            data: rows,
+            columns: dataTableColumns,
+            searching: false,
+            //pageLength: 10searching: false,   // Tắt ô Search
+            paging: false,      // Tắt phân trang (hiện toàn bộ danh sách)
+            ordering: false,    // Tắt chức năng Sort khi bấm vào tiêu đề cột
+
+            // Một số cấu hình hữu ích khác khi tắt phân trang:
+            info: false,        // Tắt dòng chữ "Showing 1 to N of N entries"
+            scrollY: '400px',   // (Tùy chọn) Thêm thanh cuộn dọc nếu bảng quá dài
+            scrollCollapse: true
+        });
+    }
+
+    function getColumnsFromHeader(headerRowObj) {
+        // headerRowObj: object key -> value
+        // Ví dụ: { "MaKH": "xxx", "TenKH": "yyy" } -> keys = ["MaKH","TenKH"]
+        return Object.keys(headerRowObj).map(k => ({ data: k, title: k }));
+    }
+
+    $('#btnLoad').on('click', function() {
+        const file = $('#excelFile')[0].files[0];
+        if (!file) { alert('Chưa chọn file'); return; }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array',cellDates: true, });
+
+            // Lấy sheet đầu tiên
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+
+            // Chuyển thành JSON theo dạng bảng (header ở dòng đầu)
+            // defval: '' để tránh undefined
+            const json = XLSX.utils.sheet_to_json(sheet, {
+                defval: '', raw: false,
+                dateNF: 'dd/mm/yyyy'
+            });
+
+            if (!json.length) { alert('Excel rỗng'); return; }
+
+            // --- Đoạn code kiểm tra trùng ---
+            let seen = new Set();
+            let duplicates = [];
+
+            json.forEach((row, index) => {
+                let containerNo = row['Cont number']; // Hoặc tên cột chính xác trong file Excel của bạn
+                if (containerNo) {
+                    if (seen.has(containerNo)) {
+                        duplicates.push(`Dòng ${index + 2}: ${containerNo}`); // index + 2 vì Excel tính từ dòng 1 và có header
+                    } else {
+                        seen.add(containerNo);
+                    }
+                }
+            });
+            //console.log(duplicates.length)
+            if (duplicates.length > 0) {
+                alert("Phát hiện số Container bị trùng:\n" + duplicates.join("\n"));
+                // return; // Dừng lại nếu bạn không muốn hiện bảng khi có lỗi trùng
+            }
+
+
+
+            // Gán _idx cho từng row để chọn đúng
+            var previewRows = json.map(function (r, i) {
+                return Object.assign({}, r, { _idx: i });
+            });
+
+            const columns = getColumnsFromHeader(json[0]); // lấy keys từ dòng đầu
+
+            buildTableFromRows(previewRows, columns);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    $('#btnImport').on('click', function() {
+        if (!dt) { alert('Chưa load Excel'); return; }
+
+        const selected = [];
+        dt.$('input.row-select:checked').each(function() {
+            const idx = parseInt($(this).data('idx'), 10);
+            selected.push(previewRows[idx]);
+        });
+
+        if (selected.length === 0) {
+            alert('Chưa chọn dòng nào');
+            return;
+        }
+
+        // Loại bỏ _idx trước khi gửi (tuỳ bạn)
+        var payload = selected.map(function (x) {
+            console.log("Dữ liệu dòng đang xử lý:", x);
+            var rest = {};
+            for (var key in x) {
+                if (x.hasOwnProperty(key) && key !== '_idx') {
+                    rest[key] = x[key];
+                }
+            }
+            return rest;
+        });
+        console.log(payload); return;
+
+        $.ajax({
+            url: '@Url.Action("ImportSelected", "Import")',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(payload),
+            success: function(res) {
+                alert(res.message || 'Import thành công');
+                // tuỳ chọn: clear preview
+            },
+            error: function(xhr) {
+                alert('Import thất bại: ' + (xhr.responseText || xhr.statusText));
+            }
+        });
+    });
+
+
+        // Sự kiện khi click vào checkbox "Check All" ở tiêu đề
+        $(document).on('click', '#checkAll', function () {
+            var isChecked = $(this).prop('checked');
+            // Chọn tất cả checkbox có class row-select và gán trạng thái tương ứng
+            $('.row-select').prop('checked', isChecked);
+        });
+
+        // (Tùy chọn) Tự động bỏ check All nếu người dùng bỏ tích một dòng bất kỳ
+        $(document).on('click', '.row-select', function () {
+            if ($('.row-select:checked').length == $('.row-select').length) {
+                $('#checkAll').prop('checked', true);
+            } else {
+                $('#checkAll').prop('checked', false);
+            }
+        });
+    </script>
+}

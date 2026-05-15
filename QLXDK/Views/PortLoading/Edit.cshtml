@@ -1,0 +1,75 @@
+﻿@model QLXDK.Models.Views.PortOfLoadingVM
+@{
+    ViewBag.Title = "Cảng đi";
+    ViewBag.Action = "Cập nhật thông tin";
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.ID)
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @if (TempData["Message"] != null)
+                            {
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    @TempData["Message"]
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="Name">Port Code</label>
+                                @Html.EditorFor(m => m.PortCode, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.PortCode, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="Name">Port Name</label>
+                                @Html.EditorFor(m => m.PortName, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(m => m.PortName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="status">Status</label>
+                                @Html.DropDownListFor(
+                                    m => m.Status,
+                                    new List<SelectListItem>
+                                    {
+                                        new SelectListItem { Text = "Kích hoạt", Value = "1" },
+                                        new SelectListItem { Text = "Khóa", Value = "0" }
+                                    },
+                                    new { @class = "form-select", id = "status" }
+                                )
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Description</label>
+                                @Html.TextAreaFor(m => m.Description, new
+                           {
+                               @class = "form-control",
+                               @rows = 3, // Số dòng hiển thị mặc định
+                               @placeholder = "Nhập ghi chú tại đây..."
+                           })
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center m-t-20">
+                            <button class="btn btn-primary" type="submit">Cập nhật</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

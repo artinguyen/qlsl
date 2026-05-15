@@ -1,0 +1,107 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<QLXDK.Models.Views.OrderListVM>
+
+<div class="col-md-12">
+    <div class="scroll-order-tbl">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Số lô LSG</th>
+                    <th>Ngày</th>
+                    <th>Khách hàng</th>
+                    <th>Tài xế</th>
+                    <th>Số xe</th>
+                    <th>Conatiner Mooc</th>
+                    <th>Container</th>
+                    <th>X/N</th>
+                    <th>Size</th>
+                    <th>Cảng lấy</th>
+                    <th>Kho về</th>
+                    <th>Cảng hạ</th>
+                    <th class="text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = ((Model.PageNumber - 1) * Model.PageSize) + 1;
+                }
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>@(stt++)</td>
+                        <td>@item.LsgNum</td>
+                        <td>@item.OrderDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.UserName</td>
+                        <td>@item.PlateNum</td>
+                        <td>@item.ContainerMooc</td>
+                        <td>@item.Container</td>
+                        <td>@item.XN</td>
+                        <td>@item.Size</td>
+                        <td>@item.PortOfLoadingName</td>
+                        <td>@item.TempLocationName</td>
+                        <td>@item.UnloadingLocationName</td>
+                        <td class="text-center">
+                            <a href="@Url.Action("Edit", "Order", new { id = item.ID })"
+                               class="btn btn-success" title="Sửa">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a href="#"
+                               class="btn btn-danger"
+                               data-bs-toggle="modal" data-bs-target="#deleteModalLive"
+                               title="Xóa"
+                               onclick="deleteConfirm('@Url.Action("Delete", "Order", new { id = item.ID })'); return false;">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+    new PagedListRenderOptions
+    {
+        UlElementClasses = new string[] { "pagination" },
+        LiElementClasses = new string[] { "page-item" },
+        FunctionToTransformEachPageLink = (liTag, aTag) =>
+        {
+            aTag.Attributes.Add("class", "page-link");
+
+            if (liTag.Attributes.ContainsKey("class") && liTag.Attributes["class"].Contains("PagedList-skipToPage"))
+            {
+                liTag.Attributes["class"] = "page-item active";
+            }
+
+            liTag.InnerHtml = aTag.ToString();
+            return liTag;
+        },
+        LinkToPreviousPageFormat = "«",
+        LinkToNextPageFormat = "»",
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5
+    })
+</div>
+
+
+
+<div id="deleteModalLive" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deleteModalLiveLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLiveLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có muốn xoá thông tin này không?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+                <button type="button" class="btn btn-primary" onclick="deleteOK()">Có</button>
+            </div>
+        </div>
+    </div>
+</div>

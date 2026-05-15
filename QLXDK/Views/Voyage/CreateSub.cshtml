@@ -1,0 +1,507 @@
+﻿@model QLXDK.Models.Views.SubVoyageVM
+@{
+    ViewBag.Title = "Chuyến sà lan";
+    ViewBag.Action = "Import container";
+}
+@using (Html.BeginForm("CreateSub", "Voyage", FormMethod.Post, new { id = "form-booking" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Cảng đi</label>
+                                @Html.DropDownList("PortOfLoadingId", (SelectList)ViewBag.LoadList, "-- Chọn cảng --", new { @class = "form-control select2-custom", @style = "width:100%" })
+                                @Html.ValidationMessageFor(m => m.PortOfLoadingId, "", new { @class = "text-danger" })
+                                <input id="VoyageId" value="@ViewBag.VoyageId" name="VoyageId" type="hidden"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Import Method</label>
+                                <select class="form-select" id="method">
+                                    <option value="1">Excel</option>
+                                    <option vaue="2">Manual</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Cảng đến</label>
+                                @Html.DropDownList("DestinationPortId", (SelectList)ViewBag.DesPortList, "-- Chọn cảng --", new { @class = "form-control select2-custom", @style = "width:100%" })
+                                @Html.ValidationMessageFor(m => m.DestinationPortId, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group section-excel">
+                                <label for="demo-input-file" class="form-label">Chọn file excel</label>
+                                <input class="form-control" type="file" id="excelFile" accept=".xlsx,.xls">
+                            </div>
+                            @*<label class="form-label" for="exampleInputEmail1">Chọn file excel:</label>
+                            <input type="file" id="excelFile" accept=".xlsx,.xls" />
+                            <button id="btnLoad" type="button" class="btn btn-primary">Tải</button>*@
+                        </div>
+                        <div class="col-12 text-right m-t-20">
+                            <section class="section-excel">
+                                <button id="btnImport" class="btn btn-primary" type="button">Import</button>
+                            </section>
+                            <section class="section-manual">
+                                <button id="btnManual" type="button" class="btn btn-primary">Import</button>
+                            </section>
+                        </div>
+                            <div class="col-12 m-t-20">
+                                <table id="dtPreview" style="width:100%; margin-top:16px;"></table>
+
+                                <!-- Manual -->
+                                <div class="table-responsive section-manual" id="containerTable">
+                                    <table class="table">
+                                        <thead>
+                                        <th><input type="checkbox" id="checkAll"></th>
+                                        <th>ContainerNo</th>
+                                        <th>SizeType</th>
+                                        <th>Line</th>
+                                        <th>BookingBillNo</th>
+                                        <th>SealNo</th>
+                                        <th>FullEmpty</th>
+                                        <th>Category</th>
+                                        <th>VesVoyName</th>
+                                        <th>PortOfLoad</th>
+                                        <th>PortOfDischarge</th>
+                                        <th>GrossWeight</th>
+                                        <th>VGM</th>
+                                        <th>TemperatureC</th>
+                                        <th>IMO</th>
+                                        <th>UN</th>
+                                        <th>Commodity</th>
+                                        <th>Remarks</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><input type="checkbox" class="row-select" /></td>
+                                                <td><input type="text" class="form-control container-no" /></td>
+                                                <td><input type="text" class="form-control size-type" /></td>
+                                                <td><input type="text" class="form-control line" /></td>
+                                                <td><input type="text" class="form-control booking-no" /></td>
+                                                <td><input type="text" class="form-control seal-no" /></td>
+                                                <td><input type="text" class="form-control full-empty" /></td>
+                                                <td><input type="text" class="form-control category" /></td>
+                                                <td><input type="text" class="form-control ves-voy" /></td>
+                                                <td><input type="text" class="form-control pol" /></td>
+                                                <td><input type="text" class="form-control pod" /></td>
+                                                <td><input type="text" class="form-control gross-weight" /></td>
+                                                <td><input type="text" class="form-control vgm" /></td>
+                                                <td><input type="text" class="form-control temp" /></td>
+                                                <td><input type="text" class="form-control imo" /></td>
+                                                <td><input type="text" class="form-control un" /></td>
+                                                <td><input type="text" class="form-control commodity" /></td>
+                                                <td><input type="text" class="form-control remarks" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <section class="section-manual">
+                                    <button id="btnAddRow" type="button" class="btn btn-primary">Add row</button>
+                                    <button id="btnDeleteRow" type="button" class="btn btn-danger">Delete row</button>
+                                    
+                                </section>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+<!-- Modal -->
+<div class="modal fade bd-example-modal-sm " data-bs-backdrop='static' tabindex="-1" aria-labelledby="mySmallModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalToggleLabel">
+                    <span class="badge bg-danger">!</span>
+                    Thông báo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                 
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+    let previewRows = [];
+    let dt = null;
+    let filterRows = [];
+    let containerList = [];
+
+    function buildTableFromRows(rows, columns) {
+        // columns: [{data: 'Ma', title:'Mã'}, ...]
+        const dataTableColumns = [
+            {
+                title: '<input type="checkbox" id="checkAll" />',
+                orderable: false,
+                data: null,
+                render: function(data, type, row) {
+                    return `<input type="checkbox" class="row-select" data-idx="${row._idx}"/>`;
+                }
+            },
+            ...columns.map(c => ({
+            title: c.title,
+            data: null,
+            render: function(data, type, row) {
+                return row[c.data] || '';
+            }
+            }))
+        ];
+
+        //if (dt) dt.destroy();
+        if ($.fn.DataTable.isDataTable('#dtPreview')) {
+            $('#dtPreview').DataTable().destroy();
+            $('#dtPreview').empty();
+        }
+
+        dt = $('#dtPreview').DataTable({
+            data: rows,
+            columns: dataTableColumns,
+            searching: false,
+            paging: false,
+            ordering: false,
+            info: false,
+            scrollY: '400px',
+            scrollX: true,
+            scrollCollapse: true
+        });
+    }
+
+    function getColumnsFromHeader(headerRowObj) {
+        // headerRowObj: object key -> value
+        return Object.keys(headerRowObj).map(k => ({ data: k, title: k }));
+    }
+
+    //$('#btnLoad').on('click', function() {
+    $('#excelFile').on('change', function (e) {
+        const file = $('#excelFile')[0].files[0];
+        if (!file) {
+            // Error load file
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array',cellDates: true, });
+
+            // Lấy sheet đầu tiên
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+
+            // Chuyển thành JSON theo dạng bảng (header ở dòng đầu)
+            const json = XLSX.utils.sheet_to_json(sheet, {
+                defval: '', raw: false,
+                dateNF: 'dd/mm/yyyy'
+            });
+
+            if (!json.length) {
+                showAlert('File excel rỗng');
+                return;
+            }
+
+            // --- Check duplication ---
+            let seen = new Set();
+            let duplicates = [];
+
+            json.forEach((row, index) => {
+                let containerNo = row['ContainerNo'];
+                if (containerNo) {
+                    if (seen.has(containerNo)) {
+
+                        //duplicates.push(`Dòng ${index + 2}: ${containerNo}`);
+                        duplicates.push(index + 2);
+                        //var duplicateRow = dt.row(index + 2).node();
+                        //$(duplicateRow).addClass('highlight-row');
+
+                    } else {
+                        seen.add(containerNo);
+                    }
+                }
+            });
+
+            //var firstKey = Object.keys(json[0] || {})[0];
+
+            // --- Gán _idx cho từng row để chọn đúng ---
+            previewRows = json.map(function (r, i) {
+                return Object.assign({}, r, { _idx: i });
+            });
+
+            // --- Filter ---
+            var firstKey = Object.keys(json[0] || {})[0];
+
+            filterRows = json.map(function (r, i) {
+                var obj = Object.assign({}, r);
+                delete obj[firstKey];              
+                obj._idx = i;                      
+                return obj;
+            });
+
+            // --- Build datatable ---
+            const columns = getColumnsFromHeader(json[0]);
+            buildTableFromRows(previewRows, columns);
+
+            // --- Validation for duplication container ---
+            duplicates.forEach((item, index) => {
+                var row = dt.row(item - 2).node();
+                $(row).addClass('highlight-row');
+            });
+
+            if (duplicates.length > 0) {
+                showAlert('Lỗi trùng số container'); return;
+            }
+        };
+        reader.readAsArrayBuffer(file);
+
+        
+    });
+
+    // --- Import excel ---
+    $('#btnImport').on('click', function () {
+        let valid = $('#form-booking').valid();
+        if (!valid) return;
+
+        if (!dt) {
+            showAlert('Chưa tải file excel');
+            return;
+        }
+
+        const selected = [];
+        containerList = [];
+        dt.$('input.row-select:checked').each(function() {
+            const idx = parseInt($(this).data('idx'), 10);
+            //selected.push(previewRows[idx]);
+            containerList.push(filterRows[idx]['Cont number']);
+            selected.push(filterRows[idx]);
+        });
+
+        if (selected.length === 0) {
+            showAlert('Chưa chọn dòng nào');
+            return;
+        }
+
+        var payload = selected.map(function (x) {
+            var rest = {};
+            for (var key in x) {
+                if (x.hasOwnProperty(key) && key !== '_idx') {
+                    rest[key] = x[key];
+                }
+            }
+            return rest;
+        });
+
+        var destId = $('#DestinationPortId').val();
+        var portId = $('#PortOfLoadingId').val();
+        var voyageId = $('#VoyageId').val();
+
+        var finalPayload = {
+            DestinationPortId: destId,
+            PortOfLoadingId: portId,
+            VoyageId: voyageId,
+            Items: payload,
+            ContainerList: containerList
+        };
+
+        $.ajax({
+            url: '@Url.Action("Import", "Voyage")',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(finalPayload),
+            success: function(res) {
+                if (res.success) {
+                    $('form').each(function () {
+                        this.reset();
+                    });
+                    if ($.fn.DataTable.isDataTable('#dtPreview')) {
+                        $('#dtPreview').DataTable().destroy();
+                        $('#dtPreview').empty();
+                    }
+                    $('#PortOfLoadingId, #DestinationPortId').val("").trigger('change');
+                    showAlert(res.message);
+                    return;
+                }
+                showAlert(res.message);
+               
+            },
+            error: function (xhr) {
+                showAlert('Import không thành công');
+            }
+        });
+    });
+
+
+        // --- Check All ---
+        $(document).on('click', '#checkAll', function () {
+            var isChecked = $(this).prop('checked');
+            $('.row-select').prop('checked', isChecked);
+        });
+
+        // --- Check by row ---
+        $(document).on('click', '.row-select', function () {
+            if ($('.row-select:checked').length == $('.row-select').length) {
+                $('#checkAll').prop('checked', true);
+            } else {
+                $('#checkAll').prop('checked', false);
+            }
+        });
+
+        // --- Check by row ---
+        $('#btnAddRow').click(function () {
+            let newRow = $('#containerTable tbody tr:first').clone();
+            newRow.find('input[type="text"]').val('');
+            newRow.find('input[type="checkbox"]').prop('checked', false);
+            $('#containerTable tbody').append(newRow);
+        });
+
+        // --- Delete by row ---
+        $('#btnDeleteRow').click(function () {
+            let checkedRows = $('.row-select:checked').closest('tr');
+
+            if (checkedRows.length === 0) {
+                showAlert('Vui lòng chọn ít nhất một dòng để xóa');
+                return;
+            }
+
+            if ($('#containerTable tbody tr').length <= checkedRows.length) {
+                //showAlert('Không thể xóa dòng cuối cùng');
+                return;
+            }
+
+            checkedRows.remove();
+            $('#checkAll').prop('checked', false);
+        });
+
+        $('#btnManual').click(function () {
+            let selectedData = [];
+            let containerList = [];
+            let hasDuplicate = false;
+
+            $('.row-select:checked').each(function () {
+                let row = $(this).closest('tr');
+                // --- Check duplicate container ---
+                let containerNo = row.find('.container-no').val();
+                if (containerNo !== "") {
+                    if (containerList.includes(containerNo)) {
+                        hasDuplicate = true;
+                        showAlert('Lỗi trùng dữ liệu');
+                        //alert('Lỗi: Phát hiện trùng mã ContainerNo: ' + containerNo + ' trong danh sách hàng được chọn!');
+                        //row.find('input[type="text"]').eq(0).css('border-color', 'red').focus();
+                        return false;
+                    }
+                    containerList.push(containerNo);
+                }
+
+                let rowData = {
+                    ContainerNo: row.find('.container-no').val(),
+                    SizeType: row.find('.size-type').val(),
+                    Line: row.find('.line').val(),
+                    BookingBillNo: row.find('.booking-no').val(),
+                    SealNo: row.find('.seal-no').val(),
+                    FullEmpty: row.find('.full-empty').val(),
+                    Category: row.find('.category').val(),
+                    VesVoyName: row.find('.ves-voy').val(),
+                    PortOfLoad: row.find('.pol').val(),
+                    PortOfDischarge: row.find('.pod').val(),
+                    GrossWeight: row.find('.gross-weight').val(),
+                    VGM: row.find('.vgm').val(),
+                    TemperatureC: row.find('.temp').val(),
+                    IMO: row.find('.imo').val(),
+                    UN: row.find('.un').val(),
+                    Commodity: row.find('.commodity').val(),
+                    Remarks: row.find('.remarks').val()
+                };
+
+                selectedData.push(rowData);
+            });
+           
+            // ---Check duplicate
+            if (hasDuplicate) {
+                return;
+            }
+
+            if (selectedData.length === 0) {
+                showAlert('Chưa có dòng nào được chọn');
+            } else {
+
+                var destId = $('#DestinationPortId').val();
+                var portId = $('#PortOfLoadingId').val();
+                var voyageId = $('#VoyageId').val();
+
+                var finalPayload = {
+                    DestinationPortId: destId,
+                    PortOfLoadingId: portId,
+                    VoyageId: voyageId,
+                    Items: selectedData,
+                    ContainerList: containerList
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Import", "Voyage")',
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(finalPayload),
+                    success: function (res) {
+                        if (res.success) {
+                            $('form').each(function () {
+                                this.reset();
+                            });
+                            resetTable();
+                            $('#PortOfLoadingId, #DestinationPortId').val("").trigger('change');
+                            showAlert(res.message);
+                            return;
+                        }
+                        showAlert(res.message);
+
+                    },
+                    error: function (xhr) {
+                        showAlert('Import không thành công');
+                    }
+                });
+
+            }
+        });
+
+        // --- Validation for selecting ---
+        $('#method').on('change', function () {
+            let selectedValue = $(this).val();
+            $('.section-excel').toggle();
+            $('.section-manual').hide();
+            if (selectedValue == "Manual") {
+                if ($.fn.DataTable.isDataTable('#dtPreview')) {
+                    $('#dtPreview').DataTable().destroy();
+                    $('#dtPreview').empty();
+                }
+                $('.section-manual').show();
+            } else {
+                resetTable();
+            }
+        });
+
+        // --- Show alert ---
+        function showAlert(text) {
+            $('.bd-example-modal-sm').modal('show');
+            $('.modal-body').text(text);
+        }
+
+        // --- Reset table ---
+        function resetTable() {
+            $('#checkAll').prop('checked', false);
+            $('#containerTable tbody tr:not(:first)').remove();
+            $('#containerTable tbody tr:first input[type="text"]').val('');
+            $('#containerTable tbody tr:first input[type="checkbox"]').prop('checked', false);
+        }
+    </script>
+}

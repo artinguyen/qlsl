@@ -1,0 +1,71 @@
+﻿@model IEnumerable<QLXDK.Models.Views.SubVoyageDetailVM>
+@{
+    ViewBag.Title = "Chuyến sà lan";
+    ViewBag.Action = "Chi tiết";
+}
+
+<div class="col-md-6">
+    @if (TempData["Message"] != null)
+            {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped" id="dtPreview">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Cảng đi</th>
+                <th>Cảng đến</th>
+                <th>Số lượng Containter</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ int stt = 1; }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(stt++)</td>
+                    <td>@item.PortOfLoadingName</td>
+                    <td>@item.DestinationPortName</td>
+                    <td class="text-center">
+                        @item.Amount
+                    </td>
+                    <td>
+                        <a href="@Url.Action("SubDetail", "Voyage", new { id = item.ID })"
+                           class="btn btn-success" title="Chi tiết">
+                            <i class="ti ti-file-check"></i>
+                        </a>
+                        <a href="#"
+                           class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModalLive" title="Xoá" onclick="deleteConfirm('@Url.Action("DeleteSub", "Voyage", new { id = item.ID })'); return false;">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div id="deleteModalLive" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deleteModalLiveLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLiveLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có muốn xoá thông tin này không?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+                <button type="button" class="btn btn-primary" onclick="deleteOK()">Có</button>
+            </div>
+        </div>
+    </div>
+</div>

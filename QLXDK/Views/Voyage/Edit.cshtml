@@ -1,0 +1,80 @@
+﻿@model QLXDK.Models.Views.VoyageEditVM
+@{
+    ViewBag.Title = "Chuyến sà lan";
+    ViewBag.Action = "Cập nhật thông tin";
+}
+@using (Html.BeginForm("Edit", "Voyage", FormMethod.Post, new { id = "form-booking" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @if (TempData["Message"] != null)
+                            {
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    @TempData["Message"]
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label" for="exampleInputEmail1">Sà lan</label>
+                            <div class="form-group">
+                                @Html.DropDownList("SalanId", (SelectList)ViewBag.SalanList, "-- Chọn depot --",
+                                new { @class = "form-control select2", @style = "width:100%", @disabled = "disabled" })
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Cảng đến</label>
+                                @Html.DropDownList("DestinationPortId", (SelectList)ViewBag.PortList, "-- Chọn cảng --", new { @class = "form-control select2", @style = "width:100%" })
+                                @Html.ValidationMessageFor(m => m.DestinationPortId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="exampleInputEmail1">Số Teus:</label>
+                                <input type="text" id="TeusInput" class="form-control" readonly value="@Model.Teus" />
+                                <input type="hidden" name="bargeName" id="bargeName" />
+                            </div>
+                        </div>
+                        <div class="col-12 text-center m-t-20">
+                            <button class="btn btn-primary" type="submit">Tạo mới</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Lắng nghe sự kiện thay đổi của dropdown Salan
+            $('#SalanSelect').change(function () {
+                // Lấy option được chọn
+                var selectedOption = $(this).find('option:selected');
+
+                // Lấy giá trị teus từ thuộc tính data-teus
+                var teusValue = selectedOption.data('teus');
+                var salanName = selectedOption.data('name');
+
+                // Hiển thị vào input (nếu null thì để trống)
+                $('#TeusInput').val(teusValue !== undefined ? teusValue : "");
+                $('#bargeName').val(salanName !== undefined ? salanName : "");
+            });
+        });
+    </script>
+}
+
+
+
+
