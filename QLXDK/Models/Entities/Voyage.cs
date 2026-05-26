@@ -15,5 +15,7 @@ namespace QLXDK.Models.Entities
         public string Name { get; set; }
         public int SalanId { get; set; }
         public int DestinationPortId { get; set; }
+        public System.DateTime? CreatedAt { get; set; }
+        public System.DateTime? UpdatedAt { get; set; }
     }
 }

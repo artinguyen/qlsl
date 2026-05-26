@@ -33,6 +33,7 @@
                 <th>Voyage</th>
                 <th>Salan</th>
                 <th>Destination port</th>
+                <th>Created at</th>
                 
                 <th class="text-center">Thao tác</th>
             </tr>
@@ -48,6 +49,7 @@
                     <td>@item.Name</td>
                     <td>@item.SalanName</td>
                     <td>@item.DestinationPortName</td>
+                    <td>@(item.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm"))</td>
                     
                     <td class="text-center">
                         <a href="@Url.Action("Edit", "Voyage", new { id = item.ID })"

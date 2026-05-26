@@ -39,5 +39,14 @@ namespace QLXDK
                 }
             }
         }
+
+        protected void Application_EndRequest(object sender, EventArgs e)
+        {
+            if (Context.Response.StatusCode == 302 && new HttpContextWrapper(Context).Request.IsAjaxRequest())
+            {
+                Context.Response.Clear();
+                Context.Response.StatusCode = 401;
+            }
+        }
     }
 }

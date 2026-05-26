@@ -48,6 +48,12 @@
                             <span class="pc-mtext">Chuyến sà lan</span>
                         </a>
                     </li>
+                    <li class="pc-item">
+                        <a href="@Url.Action("Index", "Report")" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-file-analytics"></i></span>
+                            <span class="pc-mtext">Report</span>
+                        </a>
+                    </li>
                     @*<li class="pc-item">
                         <a href="@Url.Action("Index", "Order")" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-device-mobile-message"></i></span>
@@ -392,6 +398,14 @@
             });
             var validator = $('#form-booking').validate({ ignore: null });
             
+        });
+
+        //
+        $(document).ajaxError(function (event, xhr, options) {
+            if (xhr.status === 401) {
+                //alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!");
+                window.location.href = "/User/Login";
+            }
         });
 
         $(".sailing-date, .vgm-closing-date").flatpickr({

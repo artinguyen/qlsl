@@ -35,6 +35,7 @@ namespace QLXDK.Models.Views
         public string Name { get; set; }
         public string SalanName { get; set; }
         public string DestinationPortName { get; set; }
+        public System.DateTime? CreatedAt { get; set; }
     }
 
     public class SubVoyageVM

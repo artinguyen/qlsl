@@ -78,3 +78,26 @@ table td {
 #containerTable input[type="text"] {
     min-width: 100px !important;
 }
+
+#excel-wrap{
+    position: relative;
+}
+#excel-wrap span {
+    position: absolute;
+    right: 8px;
+    top: 12px;
+    cursor: pointer;
+    color: #ff6565;
+}
+
+#tblSubDetail .table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#tblSubDetail thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f1f1f1;
+  z-index: 1;
+}

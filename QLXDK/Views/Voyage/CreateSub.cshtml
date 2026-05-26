@@ -38,7 +38,11 @@
 
                             <div class="form-group section-excel">
                                 <label for="demo-input-file" class="form-label">Chọn file excel</label>
-                                <input class="form-control" type="file" id="excelFile" accept=".xlsx,.xls">
+                                <div id="excel-wrap">
+                                    <input class="form-control" type="file" id="excelFile" accept=".xlsx,.xls">
+                                    <span>x</span>
+                                </div>
+                                
                             </div>
                             @*<label class="form-label" for="exampleInputEmail1">Chọn file excel:</label>
                             <input type="file" id="excelFile" accept=".xlsx,.xls" />
@@ -186,13 +190,14 @@
         return Object.keys(headerRowObj).map(k => ({ data: k, title: k }));
     }
 
-    //$('#btnLoad').on('click', function() {
-    $('#excelFile').on('change', function (e) {
+        //$('#btnLoad').on('click', function() {
+    $(document).on('change', '#excelFile', function () {
+    //$('#excelFile').on('change', function (e) {
         const file = $('#excelFile')[0].files[0];
         if (!file) {
             // Error load file
         }
-
+        
         const reader = new FileReader();
         reader.onload = function(e) {
             const data = new Uint8Array(e.target.result);
@@ -265,7 +270,7 @@
             }
         };
         reader.readAsArrayBuffer(file);
-
+        //$(this).val('');
         
     });
 
@@ -293,6 +298,11 @@
             return;
         }
 
+        if (selected.length > 1000) {
+            showAlert('Số lượng dòng vượt quá 1000');
+            return;
+        }
+
         var payload = selected.map(function (x) {
             var rest = {};
             for (var key in x) {
@@ -314,7 +324,6 @@
             Items: payload,
             ContainerList: containerList
         };
-
         $.ajax({
             url: '@Url.Action("Import", "Voyage")',
             type: 'POST',
@@ -337,6 +346,7 @@
                
             },
             error: function (xhr) {
+                console.log(xhr.message)
                 showAlert('Import không thành công');
             }
         });
@@ -503,5 +513,9 @@
             $('#containerTable tbody tr:first input[type="text"]').val('');
             $('#containerTable tbody tr:first input[type="checkbox"]').prop('checked', false);
         }
+        //
+        $(document).on('click', '#excel-wrap span', function () {
+            $('#excelFile').val('');
+        })
     </script>
 }

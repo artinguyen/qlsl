@@ -6,6 +6,9 @@ using System.Web.Mvc;
 using QLXDK.Models;
 using QLXDK.Models.Views;
 using PagedList;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
 
 namespace QLXDK.Controllers
 {
@@ -27,7 +30,8 @@ namespace QLXDK.Controllers
                             ID = s.ID,
                             Name = s.Name,
                             SalanName = d.Name,
-                            DestinationPortName = c.PortName
+                            DestinationPortName = c.PortName,
+                            CreatedAt = s.CreatedAt
                         })
            .OrderByDescending(u => u.ID)
            .ToPagedList(pageNumber, pageSize);
@@ -62,8 +66,27 @@ namespace QLXDK.Controllers
         }
 
         [HttpPost]
-        public ActionResult Import(int DestinationPortId, int PortOfLoadingId, int VoyageId, List<Dictionary<string, string>> Items, string[] ContainerList)
+        public ActionResult Import()
         {
+            string jsonRawData;
+            using (var reader = new StreamReader(Request.InputStream))
+            {
+                jsonRawData = reader.ReadToEnd();
+            }
+
+            if (string.IsNullOrEmpty(jsonRawData))
+            {
+                return Json(new { success = false, message = "Dữ liệu nhập trống!" });
+            }
+
+            dynamic payload = JsonConvert.DeserializeObject(jsonRawData);
+
+            int DestinationPortId = (int)payload.DestinationPortId;
+            int PortOfLoadingId = (int)payload.PortOfLoadingId;
+            int VoyageId = (int)payload.VoyageId;
+            List<Dictionary<string, string>> Items = payload.Items.ToObject<List<Dictionary<string, string>>>();
+            string[] ContainerList = payload.ContainerList.ToObject<string[]>();
+
             // Check duplicate SubVoyage
             bool isExist = _db.SubVoyages.Any(x => x.VoyageId == VoyageId
                                     && x.PortOfLoadingId == PortOfLoadingId
@@ -134,6 +157,7 @@ namespace QLXDK.Controllers
                     }
                     catch (Exception ex)
                     {
+                        Helpers.Logger.LogException(ex);
                         transaction.Rollback();
                         return Json(new { success = false, message = "Import không thành công" });
                     }
@@ -166,7 +190,8 @@ namespace QLXDK.Controllers
                     {
                         SalanId = model.SalanId,
                         Name = Name,
-                        DestinationPortId = model.DestinationPortId
+                        DestinationPortId = model.DestinationPortId,
+                        CreatedAt = DateTime.Now
                     };
 
                     _db.Voyages.Add(newItem);
@@ -277,6 +302,7 @@ namespace QLXDK.Controllers
                 var voyage = _db.Voyages.SingleOrDefault(p => p.ID == ID);
                 if (voyage == null) return HttpNotFound();
                 voyage.DestinationPortId = model.DestinationPortId;
+                voyage.UpdatedAt = DateTime.Now;
 
                 _db.SaveChanges();
                 TempData["Message"] = "Cập nhật thành công!";
@@ -355,9 +381,26 @@ namespace QLXDK.Controllers
         }
 
         [HttpPost]
-        public ActionResult Approve(int SubVoyageId, int[] IDs)
+        //public ActionResult Approve(int SubVoyageId, int[] IDs)
+        public ActionResult Approve()
         {
             try {
+                string jsonRawData;
+                using (var reader = new StreamReader(Request.InputStream))
+                {
+                    jsonRawData = reader.ReadToEnd();
+                }
+
+                if (string.IsNullOrEmpty(jsonRawData))
+                {
+                    return Json(new { success = false, message = "Dữ liệu InputStream trống!" });
+                }
+
+                dynamic payload = JsonConvert.DeserializeObject(jsonRawData);
+
+                int SubVoyageId = (int)payload.SubVoyageId;
+                int[] IDs = payload.IDs.ToObject<int[]>();
+
                 var list = _db.VoyageDetails
                     .Where(s => s.SubVoyageId == SubVoyageId &&  IDs.Contains(s.ID))
                     .ToList();

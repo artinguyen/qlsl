@@ -85,3 +85,10 @@ C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\Microsof
 C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\Microsoft.Owin.Security.Google.xml
 C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\ClosedXML.dll
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\DocumentFormat.OpenXml.dll
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\ExcelNumberFormat.dll
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\ClosedXML.pdb
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\ClosedXML.xml
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\DocumentFormat.OpenXml.xml
+C:\Users\LAPTOP HP\Documents\Visual Studio 2015\Projects\QLSL\QLXDK\bin\ExcelNumberFormat.xml
